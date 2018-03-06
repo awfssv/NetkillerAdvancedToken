@@ -38,6 +38,8 @@ contract NetkillerAdvancedToken {
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
 
+    bool lock = true;
+
     /**
      * Constrctor function
      *
@@ -59,12 +61,26 @@ contract NetkillerAdvancedToken {
         require(msg.sender == owner);
         _;
     }
+
+    modifier isLock {
+        require(!lock);
+	_;
+    }
+    
+    function lock() onlyOwner {
+        lock = true;
+    }
+
+    function unlock() onlyOwner {
+        lock  = false;
+    }
+
     function transferOwnership(address newOwner) onlyOwner public {
         owner = newOwner;
     }
  
     /* Internal transfer, only can be called by this contract */
-    function _transfer(address _from, address _to, uint _value) internal {
+    function _transfer(address _from, address _to, uint _value) isLock internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
         require (balanceOf[_from] >= _value);               // Check if the sender has enough
         require (balanceOf[_to] + _value > balanceOf[_to]); // Check for overflows
