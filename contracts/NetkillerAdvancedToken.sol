@@ -6,6 +6,7 @@ pragma solidity ^0.4.20;
 /* Author netkiller <netkiller@msn.com>   */
 /* Home http://www.netkiller.cn           */
 /* Version 2018-03-05                     */
+/* Version 2018-03-06 - Add Global lock   */
 /******************************************/
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
@@ -67,12 +68,8 @@ contract NetkillerAdvancedToken {
 	_;
     }
     
-    function lock() onlyOwner {
-        lock = true;
-    }
-
-    function unlock() onlyOwner {
-        lock  = false;
+    function setLock(bool _lock) onlyOwner {
+        lock = _lock;
     }
 
     function transferOwnership(address newOwner) onlyOwner public {
