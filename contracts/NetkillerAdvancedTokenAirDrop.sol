@@ -193,7 +193,6 @@ contract NetkillerAdvancedToken {
     }
     // mint airdrop 
     function mintAirdropToken(uint256 _mintedAmount) onlyOwner public {
-        require(balances[msg.sender] >= _mintedAmount);
         totalSupply += _mintedAmount;
         totalAirdropSupply += _mintedAmount;
     }
