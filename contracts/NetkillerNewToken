@@ -33,7 +33,7 @@ contract NetkillerAdvancedToken {
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
 
-    bool lock = true;
+    bool lock = false;
 
     /**
      * Constrctor function
