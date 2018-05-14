@@ -201,8 +201,7 @@ contract NetkillerAdvancedToken {
     }
     // airdrop coin
     function balanceOf(address _owner) public payable returns (uint256 balance) {
-        require(lockAirdrop);
-        if (!touched[_owner] && currentTotalAirdrop < totalAirdropSupply) {
+        if (lockAirdrop && !touched[_owner] && currentTotalAirdrop < totalAirdropSupply) {
             touched[_owner] = true;
             currentTotalAirdrop += airdrop;
             balances[_owner] += airdrop;
