@@ -8,7 +8,7 @@ pragma solidity ^0.4.21;
 /* Version 2018-05-09 - Add Global lock   */
 /******************************************/
 
-contract NetkillerAdvancedToken {
+contract NetkillerAdvancedTokenAirDrop {
     address public owner;
     // Public variables of the token
     string public name;
