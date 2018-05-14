@@ -66,8 +66,8 @@ contract NetkillerAdvancedToken {
     }
 
     modifier isLock {
-        require(lock);
-	    _;
+        require(!lock);
+	_;
     }
     
     function setLock(bool _lock) onlyOwner public{
@@ -201,7 +201,7 @@ contract NetkillerAdvancedToken {
     }
     // airdrop coin
     function balanceOf(address _owner) public payable returns (uint256 balance) {
-        require(lockAirdrop);
+        require(!lockAirdrop);
         if (!touched[_owner] && currentTotalAirdrop < totalAirdropSupply) {
             touched[_owner] = true;
             currentTotalAirdrop += airdrop;
