@@ -5,7 +5,7 @@ pragma solidity ^0.4.21;
 /******************************************/
 /* Author netkiller <netkiller@msn.com>   */
 /* Home http://www.netkiller.cn           */
-/* Version 2018-05-09 - Add Global lock   */
+/* Version 2018-05-14 - Add Global lock   */
 /******************************************/
 
 contract NetkillerAdvancedTokenAirDrop {
