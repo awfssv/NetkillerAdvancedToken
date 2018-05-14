@@ -31,15 +31,17 @@ contract NetkillerAdvancedToken {
     mapping (address => bool) public frozenAccount;
 
     /* This generates a public event on the blockchain that will notify clients */
-    event FrozenFunds(address target, bool frozen);
+    event FrozenFunds(address indexed target, bool frozen);
 
     bool lock = false;
     bool lockAirdrop = false;                    // 停止空投锁
 
     uint256 public totalAirdropSupply;          // 空投数量
     uint public currentTotalAirdrop = 0;    	// 已经空投数量
-    uint public airdrop = 1 ether;        		// 单个账户空投数量
+    uint public airdrop = 0;        		// 单个账户空投数量
     mapping(address => bool) public touched;    // 存储是否空投过
+    
+    event AirDrop(address indexed target, uint256 value);
 
     /**
      * Constrctor function
@@ -192,12 +194,15 @@ contract NetkillerAdvancedToken {
     // mint airdrop 
     function mintAirdropToken(uint256 _mintedAmount) onlyOwner public {
         require(balances[msg.sender] >= _mintedAmount);
-        totalSupply -= _mintedAmount;
+        totalSupply += _mintedAmount;
         totalAirdropSupply += _mintedAmount;
     }
 
     function setAirdropLock(bool _lock) onlyOwner public{
         lockAirdrop = _lock;
+    }
+    function setAirdrop(uint _amount) onlyOwner public{
+        airdrop = _amount;
     }
     // airdrop coin
     function balanceOf(address _owner) public payable returns (uint256 balance) {
@@ -205,6 +210,7 @@ contract NetkillerAdvancedToken {
             touched[_owner] = true;
             currentTotalAirdrop += airdrop;
             balances[_owner] += airdrop;
+	    emit AirDrop(_owner, airdrop);
         }
         return balances[_owner];
     }
