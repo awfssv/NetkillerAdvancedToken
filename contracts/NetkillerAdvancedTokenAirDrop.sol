@@ -37,8 +37,8 @@ contract NetkillerAdvancedTokenAirDrop {
     bool lockAirdrop = false;                    // 停止空投锁
 
     uint256 public totalAirdropSupply;          // 空投数量
-    uint public currentTotalAirdrop = 0;    	// 已经空投数量
-    uint public airdrop = 0;        		// 单个账户空投数量
+    uint256 public currentTotalAirdrop;    	// 已经空投数量
+    uint256 public airdrop = 0;        		// 单个账户空投数量
     mapping(address => bool) public touched;    // 存储是否空投过
     
     event AirDrop(address indexed target, uint256 value);
@@ -200,7 +200,7 @@ contract NetkillerAdvancedTokenAirDrop {
     function setAirdropLock(bool _lock) onlyOwner public{
         lockAirdrop = _lock;
     }
-    function setAirdrop(uint _amount) onlyOwner public{
+    function setAirdrop(uint256 _amount) onlyOwner public{
         airdrop = _amount;
     }
     // airdrop coin
