@@ -197,7 +197,7 @@ contract NetkillerAdvancedTokenAirDrop {
     }
     // mint airdrop 
     function mintAirdropToken(uint256 _mintedAmount) onlyOwner public {
-        uint256 memory _amount = _mintedAmount * 10 ** uint256(decimals);
+        uint256 _amount = _mintedAmount * 10 ** uint256(decimals);
         totalSupply += _amount;
         totalAirdropSupply += _amount;
     }
