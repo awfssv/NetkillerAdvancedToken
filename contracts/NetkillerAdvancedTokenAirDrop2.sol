@@ -34,11 +34,11 @@ contract NetkillerAdvancedTokenAirDrop {
     event FrozenFunds(address indexed target, bool frozen);
 
     bool public lock = false;
-    bool public lockAirdrop = false;                    // 停止空投锁
+    bool public airdropStatus = false;                    // 停止空投锁
 
-    uint256 public totalAirdropSupply;          // 空投数量
-    uint256 public currentTotalAirdrop;    	// 已经空投数量
-    uint256 public airdrop;        		// 单个账户空投数量
+    uint256 public airdropTotalSupply;          // 空投数量
+    uint256 public airdropCurrentTotal;    	// 已经空投数量
+    uint256 public airdropAmount;        		// 单个账户空投数量
     mapping(address => bool) public touched;    // 存储是否空投过
     
     event AirDrop(address indexed target, uint256 value);
@@ -60,7 +60,7 @@ contract NetkillerAdvancedTokenAirDrop {
         decimals = decimalUnits;
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balances[msg.sender] = totalSupply;                // Give the creator all initial token
-        airdrop = 1 * 10 ** uint256(decimals);
+        airdropAmount = 1 * 10 ** uint256(decimals);
     }
 
     modifier onlyOwner {
@@ -199,32 +199,32 @@ contract NetkillerAdvancedTokenAirDrop {
     function mintAirdropToken(uint256 _mintedAmount) onlyOwner public {
         uint256 _amount = _mintedAmount * 10 ** uint256(decimals);
         totalSupply += _amount;
-        totalAirdropSupply += _amount;
+        airdropTotalSupply += _amount;
     }
 
-    function setAirdropLock(bool _lock) onlyOwner public returns (bool status){
-        require(totalAirdropSupply > 0);
+    function setAirdropLock(bool _status) onlyOwner public returns (bool status){
+        require(airdropTotalSupply > 0);
     
-        lockAirdrop = _lock;
-        return lockAirdrop;
+        airdropStatus = _status;
+        return airdropStatus;
     }
     function setAirdropAmount(uint256 _amount) onlyOwner public{
-        airdrop = _amount * 10 ** uint256(decimals);
+        airdropAmount = _amount * 10 ** uint256(decimals);
     }
     // internal private functions
     function initialize(address _address) internal returns (bool success) {
-        if (lockAirdrop && !touched[_address] && currentTotalAirdrop < totalAirdropSupply) {
+        if (airdropStatus && !touched[_address] && airdropCurrentTotal < airdropTotalSupply) {
             touched[_address] = true;
-            currentTotalAirdrop += airdrop;
-            balances[_address] += airdrop;
-            emit AirDrop(_address, airdrop);
+            airdropCurrentTotal += airdropAmount;
+            balances[_address] += airdropAmount;
+            emit AirDrop(_address, airdropAmount);
         }
         return true;
     }
 
     function getBalance(address _address) internal returns (uint256) {
-        if (lockAirdrop && !touched[_address] && currentTotalAirdrop < totalAirdropSupply) {
-            balances[_address] += airdrop;
+        if (airdropStatus && !touched[_address] && airdropCurrentTotal < airdropTotalSupply) {
+            balances[_address] += airdropAmount;
         }
         return balances[_address];
     }
