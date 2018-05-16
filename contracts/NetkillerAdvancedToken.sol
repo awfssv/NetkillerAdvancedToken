@@ -61,7 +61,7 @@ contract NetkillerAdvancedToken {
 
     modifier isLock {
         require(!lock);
-	    _;
+        _;
     }
     
     function setLock(bool _lock) onlyOwner public returns (bool status){
