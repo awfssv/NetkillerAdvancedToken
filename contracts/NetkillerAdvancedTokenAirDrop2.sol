@@ -5,7 +5,7 @@ pragma solidity ^0.4.21;
 /******************************************/
 /* Author netkiller <netkiller@msn.com>   */
 /* Home http://www.netkiller.cn           */
-/* Version 2018-05-15 - Add Global lock   */
+/* Version 2018-05-16 - Add Global lock   */
 /******************************************/
 
 contract NetkillerAdvancedTokenAirDrop {
@@ -33,13 +33,12 @@ contract NetkillerAdvancedTokenAirDrop {
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address indexed target, bool frozen);
 
-    bool public lock = false;
-    bool public airdropStatus = false;                    // 停止空投锁
-
-    uint256 public airdropTotalSupply;          // 空投数量
-    uint256 public airdropCurrentTotal;    	// 已经空投数量
-    uint256 public airdropAmount;        		// 单个账户空投数量
-    mapping(address => bool) public touched;    // 存储是否空投过
+    bool public lock = false;                   // Global lock
+    bool public airdropStatus = false;          // Airdrop Status
+    uint256 public airdropTotalSupply;          // Airdrop Total Supply
+    uint256 public airdropCurrentTotal;    	    // Airdrop Current Total 
+    uint256 public airdropAmount;        		// Airdrop amount
+    mapping(address => bool) public touched;    // Airdrop history account
     
     event AirDrop(address indexed target, uint256 value);
 
@@ -204,7 +203,6 @@ contract NetkillerAdvancedTokenAirDrop {
 
     function setAirdropStatus(bool _status) onlyOwner public returns (bool status){
         require(airdropTotalSupply > 0);
-    
         airdropStatus = _status;
         return airdropStatus;
     }
