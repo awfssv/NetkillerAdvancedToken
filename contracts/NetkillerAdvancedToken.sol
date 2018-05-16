@@ -61,7 +61,7 @@ contract NetkillerAdvancedToken {
 
     modifier isLock {
         require(!lock);
-	_;
+	    _;
     }
     
     function setLock(bool _lock) onlyOwner public{
@@ -165,10 +165,10 @@ contract NetkillerAdvancedToken {
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
     function mintToken(address target, uint256 mintedAmount) onlyOwner public {
-        balanceOf[target] += mintedAmount;
-        totalSupply += mintedAmount;
-        emit Transfer(0, this, mintedAmount);
-        emit Transfer(this, target, mintedAmount);
+        uint256 _amount = mintedAmount * 10 ** uint256(decimals);
+        balanceOf[target] += _amount;
+        totalSupply += _amount;
+        emit Transfer(this, target, _amount);
     }
 
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
