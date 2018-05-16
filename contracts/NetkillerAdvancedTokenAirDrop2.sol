@@ -202,7 +202,7 @@ contract NetkillerAdvancedTokenAirDrop {
         airdropTotalSupply += _amount;
     }
 
-    function setAirdropLock(bool _status) onlyOwner public returns (bool status){
+    function setAirdropStatus(bool _status) onlyOwner public returns (bool status){
         require(airdropTotalSupply > 0);
     
         airdropStatus = _status;
