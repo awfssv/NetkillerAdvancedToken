@@ -10,7 +10,6 @@ pragma solidity ^0.4.21;
 
 contract NetkillerToken {
     address public owner;
-    // Public variables of the token
     string public name;
     string public symbol;
     uint public decimals;
