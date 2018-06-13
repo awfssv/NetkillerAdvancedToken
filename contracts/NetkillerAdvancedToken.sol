@@ -5,10 +5,39 @@ pragma solidity ^0.4.21;
 /******************************************/
 /* Author netkiller <netkiller@msn.com>   */
 /* Home http://www.netkiller.cn           */
-/* Version 2018-05-16 - Add Global lock   */
+/* Version 2018-06-13 - SafeMatch         */
 /******************************************/
+library SafeMath {
+
+    function mul(uint256 a, uint256 b) internal pure returns (uint256 c) {
+        if (a == 0) {
+            return 0;
+        }
+        c = a * b;
+        assert(c / a == b);
+        return c;
+    }
+
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a / b;
+    }
+
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        assert(b <= a);
+        return a - b;
+    }
+
+    function add(uint256 a, uint256 b) internal pure returns (uint256 c) {
+        c = a + b;
+        assert(c >= a);
+        return c;
+    }
+}
 
 contract NetkillerAdvancedToken {
+    
+    using SafeMath for uint256;
+    
     address public owner;
     // Public variables of the token
     string public name;
@@ -40,7 +69,7 @@ contract NetkillerAdvancedToken {
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-    function NetkillerAdvancedToken(
+    constructor(
         uint256 initialSupply,
         string tokenName,
         string tokenSymbol,
@@ -69,9 +98,9 @@ contract NetkillerAdvancedToken {
         return lock;
     }
 
-    function transferOwnership(address newOwner) onlyOwner public {
-        if (newOwner != address(0)) {
-            owner = newOwner;
+    function transferOwnership(address _newOwner) onlyOwner public {
+        if (_newOwner != address(0)) {
+            owner = _newOwner;
         }
     }
     function balanceOf(address _address) view public returns (uint256 balance) {
@@ -79,14 +108,14 @@ contract NetkillerAdvancedToken {
     }
     
     /* Internal transfer, only can be called by this contract */
-    function _transfer(address _from, address _to, uint _value) isLock internal {
-        require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
-        require (balances[_from] >= _value);               // Check if the sender has enough
-        require (balances[_to] + _value > balances[_to]); // Check for overflows
+    function _transfer(address _from, address _to, uint256 _value) isLock internal {
+        require (_to != address(0));                        // Prevent transfer to 0x0 address. Use burn() instead
+        require (balances[_from] >= _value);                // Check if the sender has enough
+        require (balances[_to] + _value > balances[_to]);   // Check for overflows
         require(!frozenAccount[_from]);                     // Check if sender is frozen
         require(!frozenAccount[_to]);                       // Check if recipient is frozen
-        balances[_from] -= _value;                         // Subtract from the sender
-        balances[_to] += _value;                           // Add the same to the recipient
+        balances[_from] = balances[_from].sub(_value);      // Subtract from the sender
+        balances[_to] = balances[_to].add(_value);          // Add the same to the recipient
         emit Transfer(_from, _to, _value);
     }
 
@@ -98,8 +127,9 @@ contract NetkillerAdvancedToken {
      * @param _to The address of the recipient
      * @param _value the amount to send
      */
-    function transfer(address _to, uint256 _value) public {
+    function transfer(address _to, uint256 _value) public returns (bool success) {
         _transfer(msg.sender, _to, _value);
+        return true;
     }
 
     /**
@@ -112,8 +142,9 @@ contract NetkillerAdvancedToken {
      * @param _value the amount to send
      */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+        require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);     // Check allowance
-        allowed[_from][msg.sender] -= _value;
+        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         _transfer(_from, _to, _value);
         return true;
     }
@@ -134,6 +165,44 @@ contract NetkillerAdvancedToken {
     function allowance(address _owner, address _spender) view public returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+
+    /**
+     * @dev Increase the amount of tokens that an owner allowed to a spender.
+     *
+     * approve should be called when allowed[_spender] == 0. To increment
+     * allowed value is better to use this function to avoid 2 calls (and wait until
+     * the first transaction is mined)
+     * From MonolithDAO Token.sol
+     * @param _spender The address which will spend the funds.
+     * @param _addedValue The amount of tokens to increase the allowance by.
+     */
+    function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
+        allowed[msg.sender][_spender] = (allowed[msg.sender][_spender].add(_addedValue));
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+        return true;
+    }
+
+    /**
+     * @dev Decrease the amount of tokens that an owner allowed to a spender.
+     *
+     * approve should be called when allowed[_spender] == 0. To decrement
+     * allowed value is better to use this function to avoid 2 calls (and wait until
+     * the first transaction is mined)
+     * From MonolithDAO Token.sol
+     * @param _spender The address which will spend the funds.
+     * @param _subtractedValue The amount of tokens to decrease the allowance by.
+     */
+    function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
+        uint oldValue = allowed[msg.sender][_spender];
+        if (_subtractedValue > oldValue) {
+            allowed[msg.sender][_spender] = 0;
+        } else {
+            allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
+        }
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+        return true;
+    }
+
     /**
      * Destroy tokens
      *
@@ -142,9 +211,9 @@ contract NetkillerAdvancedToken {
      * @param _value the amount of money to burn
      */
     function burn(uint256 _value) onlyOwner public returns (bool success) {
-        require(balances[msg.sender] >= _value);   // Check if the sender has enough
-        balances[msg.sender] -= _value;            // Subtract from the sender
-        totalSupply -= _value;                      // Updates totalSupply
+        require(balances[msg.sender] >= _value);                    // Check if the sender has enough
+        balances[msg.sender] = balances[msg.sender].sub(_value);    // Subtract from the sender
+        totalSupply = totalSupply.sub(_value);                      // Updates totalSupply
         emit Burn(msg.sender, _value);
         return true;
     }
@@ -158,23 +227,23 @@ contract NetkillerAdvancedToken {
      * @param _value the amount of money to burn
      */
     function burnFrom(address _from, uint256 _value) onlyOwner public returns (bool success) {
-        require(balances[_from] >= _value);                // Check if the targeted balance is enough
-        require(_value <= allowed[_from][msg.sender]);    // Check allowance
-        balances[_from] -= _value;                         // Subtract from the targeted balance
-        allowed[_from][msg.sender] -= _value;             // Subtract from the sender's allowance
-        totalSupply -= _value;                              // Update totalSupply
+        require(balances[_from] >= _value);                                      // Check if the targeted balance is enough
+        require(_value <= allowed[_from][msg.sender]);                           // Check allowance
+        balances[_from] = balances[_from].sub(_value);                           // Subtract from the targeted balance
+        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);     // Subtract from the sender's allowance
+        totalSupply = totalSupply.sub(_value);                                   // Update totalSupply
         emit Burn(_from, _value);
         return true;
     }
 
-    /// @notice Create `mintedAmount` tokens and send it to `target`
-    /// @param target Address to receive the tokens
-    /// @param mintedAmount the amount of tokens it will receive
-    function mintToken(address target, uint256 mintedAmount) onlyOwner public {
-        uint256 _amount = mintedAmount * 10 ** uint256(decimals);
-        balances[target] += _amount;
-        totalSupply += _amount;
-        emit Transfer(this, target, _amount);
+    /// @notice Create `_amount` tokens and send it to `_to`
+    /// @param _to Address to receive the tokens
+    /// @param _amount the amount of tokens it will receive
+    function mintToken(address _to, uint256 _amount) onlyOwner public {
+        uint256 amount = _amount * 10 ** uint256(decimals);
+        totalSupply = totalSupply.add(amount);
+        balances[_to] = balances[_to].add(amount);
+        emit Transfer(this, _to, amount);
     }
 
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
