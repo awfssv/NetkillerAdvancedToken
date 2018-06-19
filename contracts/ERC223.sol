@@ -1,7 +1,6 @@
 pragma solidity ^0.4.24;
-
 /******************************************/
-/*       Netkiller ADVANCED TOKEN         */
+/*       Netkiller ERC223 TOKEN           */
 /******************************************/
 /* Author netkiller <netkiller@msn.com>   */
 /* Home http://www.netkiller.cn           */
@@ -34,7 +33,31 @@ library SafeMath {
     }
 }
 
-contract NetkillerAdvancedToken {
+
+contract contractReceiver{
+    function tokenFallback(address _from, uint _value);
+}
+
+ /* New ERC223 contract interface */
+ 
+contract ERC223 {
+    uint public totalSupply;
+    function balanceOf(address who) public view returns (uint);
+  
+    function name() public view returns (string _name);
+    function symbol() public view returns (string _symbol);
+    function decimals() public view returns (uint8 _decimals);
+    function totalSupply() public view returns (uint256 _supply);
+
+    function transfer(address to, uint value) public returns (bool ok);
+    function transfer(address to, uint value, bytes data) public returns (bool ok);
+    function transfer(address to, uint value, bytes data, string custom_fallback) public returns (bool ok);
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Transfer(address indexed from, address indexed to, uint256 value, bytes indexed data);
+}
+
+contract NetkillerAdvancedToken is ERC223{
     
     using SafeMath for uint256;
     
@@ -103,6 +126,23 @@ contract NetkillerAdvancedToken {
             owner = _newOwner;
         }
     }
+
+    function name() constant returns (string _name) {
+        return name;
+    }
+
+    function symbol() constant returns (string _symbol) {
+        return symbol;
+    }
+
+    function decimals() constant returns (uint8 _decimals) {
+        return decimals;
+    }
+
+    function totalSupply() constant returns (uint256 _totalSupply) {
+        return totalSupply;
+    }
+
     function balanceOf(address _address) view public returns (uint256 balance) {
         return balances[_address];
     }
