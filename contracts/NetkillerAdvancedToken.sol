@@ -253,4 +253,11 @@ contract NetkillerAdvancedToken {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
+
+    function transferBatch(address[] _to, uint256 _value) public returns (bool success) {
+        for (uint i=0; i<_to.length; i++) {
+            _transfer(msg.sender, _to[i], _value);
+        }
+        return true;
+    }
 }
