@@ -5,7 +5,7 @@ pragma solidity ^0.4.24;
 /******************************************/
 /* Author netkiller <netkiller@msn.com>   */
 /* Home http://www.netkiller.cn           */
-/* Version 2018-06-13 - SafeMatch         */
+/* Version 2018-07-25 - batchTransfer     */
 /******************************************/
 library SafeMath {
 
@@ -254,9 +254,25 @@ contract NetkillerAdvancedToken {
         emit FrozenFunds(target, freeze);
     }
 
-    function transferBatch(address[] _to, uint256 _value) public returns (bool success) {
+    function airdrop(address[] _to, uint256 _value) public returns (bool success) {
         for (uint i=0; i<_to.length; i++) {
             _transfer(msg.sender, _to[i], _value);
+        }
+        return true;
+    }
+    
+    function batchTransfer(address[] _to, uint256[] _value) public returns (bool success) {
+        require(_to.length == _value.length);
+
+        uint256 amount = 0;
+        for(uint n=0;n<_value.length;n++){
+            amount += _value[n];
+        }
+        
+        require(amount > 0 && balanceOf(msg.sender) >= amount);
+        
+        for (uint i=0; i<_to.length; i++) {
+            transfer(_to[i], _value[i]);
         }
         return true;
     }
