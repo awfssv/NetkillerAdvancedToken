@@ -5,7 +5,7 @@ pragma solidity ^0.4.24;
 /******************************************/
 /* Author netkiller <netkiller@msn.com>   */
 /* Home http://www.netkiller.cn           */
-/* Version 2018-07-25 - batchTransfer     */
+/* Version 2018-07-26 - batchTransfer     */
 /******************************************/
 library SafeMath {
 
