@@ -255,6 +255,9 @@ contract NetkillerAdvancedToken {
     }
 
     function airdrop(address[] _to, uint256 _value) public returns (bool success) {
+        
+        require(_value > 0 && balanceOf(msg.sender) >= _value.mul(_to.length));
+        
         for (uint i=0; i<_to.length; i++) {
             _transfer(msg.sender, _to[i], _value);
         }
@@ -266,7 +269,7 @@ contract NetkillerAdvancedToken {
 
         uint256 amount = 0;
         for(uint n=0;n<_value.length;n++){
-            amount += _value[n];
+            amount = amount.add(_value[n]);
         }
         
         require(amount > 0 && balanceOf(msg.sender) >= amount);
