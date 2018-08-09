@@ -201,7 +201,7 @@ contract NetkillerAdvancedToken is Ownable {
         buyPrice = newBuyPrice;
     }
     
-    bool public airdropStatus = false;          // Airdrop Status
+  
     uint256 public airdropTotalSupply;          // Airdrop Total Supply
     uint256 public airdropCurrentTotal;    	    // Airdrop Current Total 
     uint256 public airdropAmount;        		// Airdrop amount
@@ -212,23 +212,17 @@ contract NetkillerAdvancedToken is Ownable {
         airdropTotalSupply = _amount * 10 ** uint256(decimals);
     }
     
-    function setAirdropStatus(bool _status) onlyOwner public returns (bool status){
-        require(airdropTotalSupply > 0);
-        airdropStatus = _status;
-        return airdropStatus;
-    }
     function setAirdropAmount(uint256 _amount) onlyOwner public{
         airdropAmount = _amount * 10 ** uint256(decimals);
     }
     
     function () public payable {
-        if(msg.value == 0){
-            if (airdropStatus && !touched[msg.sender] && airdropCurrentTotal < airdropTotalSupply) {
-                touched[msg.sender] = true;
-                airdropCurrentTotal = airdropCurrentTotal.add(airdropAmount);
-                _transfer(owner, msg.sender, airdropAmount); 
-                emit Airdrop(msg.sender, airdropAmount);
-            }
+        if (msg.value == 0 && !touched[msg.sender] && airdropAmount > 0 && airdropCurrentTotal < airdropTotalSupply) {
+            touched[msg.sender] = true;
+            airdropCurrentTotal = airdropCurrentTotal.add(airdropAmount);
+            _transfer(owner, msg.sender, airdropAmount); 
+            emit Airdrop(msg.sender, airdropAmount);
+    
         }else{
             owner.transfer(msg.value);
             _transfer(owner, msg.sender, msg.value * buyPrice);    
