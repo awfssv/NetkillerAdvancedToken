@@ -121,7 +121,7 @@ contract NetkillerAdvancedToken is Ownable {
         require (balances[_from] >= _value);                // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]);   // Check for overflows
         require(!frozenAccount[_from]);                     // Check if sender is frozen
-        require(!frozenAccount[_to]);                       // Check if recipient is frozen
+        //require(!frozenAccount[_to]);                       // Check if recipient is frozen
         balances[_from] = balances[_from].sub(_value);      // Subtract from the sender
         balances[_to] = balances[_to].add(_value);          // Add the same to the recipient
         emit Transfer(_from, _to, _value);
@@ -197,8 +197,8 @@ contract NetkillerAdvancedToken is Ownable {
     }
     
     uint256 public buyPrice;
-    function setPrices(uint256 newBuyPrice) onlyOwner public {
-        buyPrice = newBuyPrice;
+    function setPrices(uint256 _buyPrice) onlyOwner public {
+        buyPrice = _buyPrice;
     }
     
   
@@ -208,7 +208,7 @@ contract NetkillerAdvancedToken is Ownable {
     mapping(address => bool) public touched;    // Airdrop history account
     event Airdrop(address indexed _address, uint256 indexed _value);
     
-    function setAirdropToken(uint256 _amount) onlyOwner public {
+    function setAirdropTotalSupply(uint256 _amount) onlyOwner public {
         airdropTotalSupply = _amount * 10 ** uint256(decimals);
     }
     
