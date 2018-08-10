@@ -9,29 +9,36 @@ pragma solidity ^0.4.24;
 /******************************************/
 library SafeMath {
 
-    function mul(uint256 a, uint256 b) internal pure returns (uint256 c) {
-        if (a == 0) {
-            return 0;
-        }
-        c = a * b;
-        assert(c / a == b);
-        return c;
+  function mul(uint256 _a, uint256 _b) internal pure returns (uint256) {
+    if (_a == 0) {
+      return 0;
     }
 
-    function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a / b;
-    }
+    uint256 c = _a * _b;
+    assert(c / _a == _b);
 
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        assert(b <= a);
-        return a - b;
-    }
+    return c;
+  }
 
-    function add(uint256 a, uint256 b) internal pure returns (uint256 c) {
-        c = a + b;
-        assert(c >= a);
-        return c;
-    }
+  function div(uint256 _a, uint256 _b) internal pure returns (uint256) {
+    uint256 c = _a / _b;
+
+    return c;
+  }
+
+  function sub(uint256 _a, uint256 _b) internal pure returns (uint256) {
+    assert(_b <= _a);
+    uint256 c = _a - _b;
+
+    return c;
+  }
+
+  function add(uint256 _a, uint256 _b) internal pure returns (uint256) {
+    uint256 c = _a + _b;
+    assert(c >= _a);
+
+    return c;
+  }
 }
 
 contract NetkillerAdvancedToken {
