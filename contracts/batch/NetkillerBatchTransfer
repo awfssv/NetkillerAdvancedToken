@@ -8,6 +8,33 @@ pragma solidity ^0.4.24;
 /* Version 2018-07-25 - Batch Transfer    */
 /******************************************/
 
+library SafeMath {
+
+    function mul(uint256 a, uint256 b) internal pure returns (uint256 c) {
+        if (a == 0) {
+            return 0;
+        }
+        c = a * b;
+        assert(c / a == b);
+        return c;
+    }
+
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a / b;
+    }
+
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        assert(b <= a);
+        return a - b;
+    }
+
+    function add(uint256 a, uint256 b) internal pure returns (uint256 c) {
+        c = a + b;
+        assert(c >= a);
+        return c;
+    }
+}
+
 contract ERC20 {
     uint256 public totalSupply;
     uint public decimals;
@@ -18,6 +45,7 @@ contract ERC20 {
 
 contract NetkillerBatchTransfer {
 
+    using SafeMath for uint256;
     // address public contractAddress;
     ERC20 public token;
     
@@ -47,5 +75,9 @@ contract NetkillerBatchTransfer {
         for (uint i=0; i<_to.length; i++) {
             token.transfer(_to[i], _value[i]);
         }
+    }
+    function transferAnyERC20Token(address _contractAddress, address _to, uint256 _value) public returns (bool success) 
+    {
+        return ERC20(_contractAddress).transfer(_to, _value);
     }
 }
