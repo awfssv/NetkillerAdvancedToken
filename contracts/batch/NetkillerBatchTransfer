@@ -35,27 +35,50 @@ library SafeMath {
     }
 }
 
-contract ERC20 {
+contract ERC20Interface {
+    
+    //using SafeMath for uint256;
     uint256 public totalSupply;
+    string public name;
+    string public symbol;
     uint public decimals;
-    function balanceOf(address _address) constant public returns (uint256);
+    function balanceOf(address _address) view public returns (uint256 balance);
     function transfer(address _to, uint256 _value) public returns (bool success);
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
+    function approve(address _spender, uint256 _value) public returns (bool success);
+    function allowance(address _owner, address _spender) view public returns (uint256 remaining);
     event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
 contract NetkillerBatchTransfer {
 
     using SafeMath for uint256;
-    // address public contractAddress;
-    ERC20 public token;
+    address public contractAddress;
+    ERC20Interface public token;
     
     constructor(address _contractAddress) public {
-        // contractAddress = _contractAddress;
-        token = ERC20(_contractAddress);
+        contractAddress = _contractAddress;
+        token = ERC20Interface(contractAddress);
     }
-    function getBalance(address _address) view public returns (uint256){
-        return token.balanceOf(_address);
+    
+    function getTotalSupply() view public returns (uint256){
+        return token.totalSupply();
     }
+    function getName() view public returns (string){
+        return token.name();
+    }
+    function getBalance() view public returns (uint256){
+        return token.balanceOf(msg.sender);
+    }
+    function test() public returns (bool success) {
+        return token.transfer(0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef, 10000);
+    }
+    
+    function test2() public returns (bool success) {
+        return ERC20Interface(contractAddress).transfer(0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef, 10000);
+    }
+    
     function airdrop(address[] _to, uint256 _value) public returns (bool success) {
         for (uint i=0; i<_to.length; i++) {
             token.transfer(_to[i], _value);
@@ -76,8 +99,9 @@ contract NetkillerBatchTransfer {
             token.transfer(_to[i], _value[i]);
         }
     }
-    function transferAnyERC20Token(address _contractAddress, address _to, uint256 _value) public returns (bool success) 
-    {
-        return ERC20(_contractAddress).transfer(_to, _value);
+    
+    function transferAnyERC20Token(address tokenAddress, address _to, uint256 _value) public returns (bool success) {
+        return ERC20Interface(tokenAddress).transfer(_to, _value);
     }
+    
 }
